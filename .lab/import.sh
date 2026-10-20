@@ -7,6 +7,5 @@ cat .lab/proof.json
 "$PWD/.lab/bin/buildkite-gha-linux-amd64" --version
 exec "$PWD/.lab/bin/buildkite-gha-linux-amd64" upload \
   --runtime-distribution "windows/amd64=$PWD/.lab/bin/buildkite-gha-windows-amd64.exe" \
-  --runner-queue ubuntu-latest=linux-medium \
   --runner-queue windows-2022=windows-medium \
-  .github/workflows/cross-os-cache.yml
+  .github/workflows/windows-cache.yml
