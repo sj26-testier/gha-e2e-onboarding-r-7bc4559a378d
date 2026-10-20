@@ -1,5 +1,0 @@
-name: Record managed Node24
-description: No dependencies or installation
-runs:
-  using: node24
-  main: index.js

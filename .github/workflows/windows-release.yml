@@ -1,7 +1,7 @@
-name: PR610 Windows-only zstd cache proof
+name: Released Windows zstd and JAVA_HOME synthetic proof
 on:
   push:
-    branches: [lab/r-93ce39e42b3f]
+    branches: [lab/r-289a78e6dc66]
 permissions:
   contents: read
 jobs:
@@ -11,9 +11,9 @@ jobs:
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
-      - name: Record managed Node24 executable
-        id: node24
-        uses: ./.lab/actions/node24
+      - name: Verify released runtime and original host JAVA_HOME consumer
+        shell: pwsh
+        run: ./.lab/released-probe.ps1
       - name: Verify fresh workspace and exact inputs
         shell: pwsh
         run: |
@@ -26,7 +26,6 @@ jobs:
           Get-FileHash -Algorithm SHA256 -LiteralPath $stock | Format-List
           & $stock '--version'
           if ($LASTEXITCODE -ne 0) { throw 'Stock zstd version failed' }
-          if ((Get-FileHash -Algorithm SHA256 -LiteralPath .lab/bin/cache-final.test.exe).Hash.ToLowerInvariant() -ne '3f2d8402dbba2a21c073cf00fca824a85148bed5df70731b2753ca9f0a4c608b') { throw 'Supplied test digest mismatch' }
       - name: Prepare independently hashed A
         shell: pwsh
         run: |
@@ -41,7 +40,7 @@ jobs:
         uses: actions/cache/save@0057852bfaa89a56745cba8c7296529d2fc39830
         with:
           path: cache-data
-          key: lab-pr610-r-93ce39e42b3f-windows-A
+          key: lab-pr610-r-289a78e6dc66-windows-A
           enableCrossOsArchive: true
       - name: Delete A before restore
         shell: pwsh
@@ -55,7 +54,7 @@ jobs:
         uses: actions/cache/restore@0057852bfaa89a56745cba8c7296529d2fc39830
         with:
           path: cache-data
-          key: lab-pr610-r-93ce39e42b3f-windows-A
+          key: lab-pr610-r-289a78e6dc66-windows-A
           enableCrossOsArchive: true
           fail-on-cache-miss: true
       - name: Verify restored A independently
@@ -65,7 +64,7 @@ jobs:
           CACHE_MATCHED_KEY: ${{ steps.restore_a.outputs.cache-matched-key }}
         run: |
           $ErrorActionPreference = 'Stop'
-          if ($env:CACHE_HIT -ne 'true' -or $env:CACHE_MATCHED_KEY -ne 'lab-pr610-r-93ce39e42b3f-windows-A') { throw 'Expected exact key A, not a prefix hit or miss' }
+          if ($env:CACHE_HIT -ne 'true' -or $env:CACHE_MATCHED_KEY -ne 'lab-pr610-r-289a78e6dc66-windows-A') { throw 'Expected exact key A, not a prefix hit or miss' }
           $hash = (Get-FileHash -Algorithm SHA256 -LiteralPath cache-data/payload.bin).Hash.ToLowerInvariant()
           if ($hash -ne '9b1f9ae8e66bfdd719cdebe9cb48505681dbdb2f8f3764aa1cedebbfc1ef6ec1') { throw 'Restored A bytes differ' }
           Write-Output "LAB_CACHE_A_VERIFIED: sha256=$hash key=$env:CACHE_MATCHED_KEY"
@@ -83,7 +82,7 @@ jobs:
         uses: actions/cache/save@0057852bfaa89a56745cba8c7296529d2fc39830
         with:
           path: cache-data
-          key: lab-pr610-r-93ce39e42b3f-windows-B
+          key: lab-pr610-r-289a78e6dc66-windows-B
           enableCrossOsArchive: true
       - name: Delete B before restore
         shell: pwsh
@@ -97,7 +96,7 @@ jobs:
         uses: actions/cache/restore@0057852bfaa89a56745cba8c7296529d2fc39830
         with:
           path: cache-data
-          key: lab-pr610-r-93ce39e42b3f-windows-B
+          key: lab-pr610-r-289a78e6dc66-windows-B
           enableCrossOsArchive: true
           fail-on-cache-miss: true
       - name: Verify restored B independently
@@ -107,16 +106,7 @@ jobs:
           CACHE_MATCHED_KEY: ${{ steps.restore_b.outputs.cache-matched-key }}
         run: |
           $ErrorActionPreference = 'Stop'
-          if ($env:CACHE_HIT -ne 'true' -or $env:CACHE_MATCHED_KEY -ne 'lab-pr610-r-93ce39e42b3f-windows-B') { throw 'Expected exact key B, not a prefix hit or miss' }
+          if ($env:CACHE_HIT -ne 'true' -or $env:CACHE_MATCHED_KEY -ne 'lab-pr610-r-289a78e6dc66-windows-B') { throw 'Expected exact key B, not a prefix hit or miss' }
           $hash = (Get-FileHash -Algorithm SHA256 -LiteralPath cache-data/payload.bin).Hash.ToLowerInvariant()
           if ($hash -ne '9e3935cbe17adf7a71497ca1ed71f39ba8afd23793698db21f433f8e5b153400') { throw 'Restored B bytes differ' }
           Write-Output "LAB_CACHE_B_VERIFIED: sha256=$hash key=$env:CACHE_MATCHED_KEY"
-      - name: Execute all selected Windows archive and isolation regressions
-        shell: pwsh
-        env:
-          BUILDKITE_GHA_TEST_NODE24: ${{ steps.node24.outputs.executable }}
-        run: |
-          $ErrorActionPreference = 'Stop'
-          if (-not [IO.Path]::IsPathFullyQualified($env:BUILDKITE_GHA_TEST_NODE24)) { throw 'Node24 path is not absolute' }
-          & $env:BUILDKITE_GHA_TEST_NODE24 './.lab/run-windows-tests.cjs'
-          if ($LASTEXITCODE -ne 0) { throw 'Windows regression wrapper failed' }
