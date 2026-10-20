@@ -1,0 +1,13 @@
+{
+  "source_commit": "c4d853be8d4759d7a5433c70cb4cccf8e2ce2166",
+  "linux_sha256": "bbd256ed588ade967ebf28ad63366de87d884ebdf39529f846621221033b79cd",
+  "windows_sha256": "4c582c428176f4a42e179c7086338c0efc095dc30ba5a554bd21dd361b1cce9d",
+  "windows_test_sha256": "3f2d8402dbba2a21c073cf00fca824a85148bed5df70731b2753ca9f0a4c608b",
+  "run_id": "r-7bc4559a378d",
+  "cache_action_commit": "0057852bfaa89a56745cba8c7296529d2fc39830",
+  "key_a": "lab-pr610-r-7bc4559a378d-cross-os-A",
+  "key_b": "lab-pr610-r-7bc4559a378d-cross-os-B",
+  "payload_a_sha256": "9b1f9ae8e66bfdd719cdebe9cb48505681dbdb2f8f3764aa1cedebbfc1ef6ec1",
+  "payload_b_sha256": "9e3935cbe17adf7a71497ca1ed71f39ba8afd23793698db21f433f8e5b153400",
+  "cache_path": "cache-data"
+}

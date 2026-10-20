@@ -1,0 +1,7 @@
+const fs = require('node:fs')
+const path = require('node:path')
+const crypto = require('node:crypto')
+if (!path.isAbsolute(process.execPath) || !process.version.startsWith('v24.')) throw new Error('Absolute managed Node24 required')
+const sha256 = crypto.createHash('sha256').update(fs.readFileSync(process.execPath)).digest('hex')
+console.log('LAB_MANAGED_NODE24: ' + JSON.stringify({version: process.version, executable: process.execPath, sha256}))
+fs.appendFileSync(process.env.GITHUB_OUTPUT, 'executable=' + process.execPath + '\n')
